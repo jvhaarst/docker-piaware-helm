@@ -1,0 +1,32 @@
+PiAware has been deployed!
+
+To verify the deployment, run:
+
+  kubectl get deployment -n {{ include "piaware.namespace" . }} {{ include "piaware.fullname" . }}
+
+To check the pods:
+
+  kubectl get pods -n {{ include "piaware.namespace" . }} -l app.kubernetes.io/name={{ include "piaware.name" . }}
+
+To view logs:
+
+  kubectl logs -n {{ include "piaware.namespace" . }} -l app.kubernetes.io/name={{ include "piaware.name" . }}
+
+To access the web interface:
+
+  kubectl port-forward -n {{ include "piaware.namespace" . }} svc/{{ include "piaware.fullname" . }} 8080:{{ .Values.service.webPort }}
+
+Then open http://localhost:8080 in your browser.
+
+IMPORTANT: Make sure your Kubernetes nodes with RTL-SDR hardware are labeled:
+
+  kubectl label node <node-name> rtlsdr=true
+
+{{- if not (or .Values.flightaware.feederId .Values.flightaware.existingSecret) }}
+
+WARNING: No FlightAware Feeder ID configured! Your data will not be sent to FlightAware.
+Set flightaware.feederId in your values, or use flightaware.existingSecret to
+reference an existing Kubernetes secret containing your FEEDER_ID.
+
+To get a Feeder ID, visit: https://flightaware.com/adsb/piaware/claim
+{{- end }}

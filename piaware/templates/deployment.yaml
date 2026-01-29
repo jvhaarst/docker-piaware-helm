@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "piaware.fullname" . }}
+  namespace: {{ include "piaware.namespace" . }}
+  labels:
+    {{- include "piaware.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "piaware.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+  template:
+    metadata:
+      labels:
+        {{- include "piaware.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: adsb-feeder
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      # Node selector for RTL-SDR hardware nodes
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          # Environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: {{ include "piaware.fullname" . }}-config
+
+          # Feeder ID from Secret
+          env:
+            {{- if or .Values.flightaware.feederId .Values.flightaware.existingSecret }}
+            - name: FEEDER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "piaware.secretName" . }}
+                  key: {{ .Values.flightaware.secretKey }}
+            {{- end }}
+
+          # Ports
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP
+            - name: beast
+              containerPort: 30005
+              protocol: TCP
+            - name: basestation
+              containerPort: 30003
+              protocol: TCP
+            {{- if .Values.uat.receiverType }}
+            - name: uat
+              containerPort: 30978
+              protocol: TCP
+            {{- end }}
+
+          # Security context for USB device access
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+
+          # Volume mounts for USB devices and tmpfs
+          volumeMounts:
+            - name: usb
+              mountPath: /dev/bus/usb
+            - name: run
+              mountPath: /run
+            - name: var-log
+              mountPath: /var/log
+
+          # Resources
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          {{- if .Values.livenessProbe.enabled }}
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: web
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+
+          {{- if .Values.readinessProbe.enabled }}
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: web
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+
+      volumes:
+        - name: usb
+          hostPath:
+            path: /dev/bus/usb
+            type: Directory
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+        - name: var-log
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+
+      # Tolerations
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Restart policy
+      restartPolicy: Always
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 30

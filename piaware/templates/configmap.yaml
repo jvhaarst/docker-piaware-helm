@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "piaware.fullname" . }}-config
+  namespace: {{ include "piaware.namespace" . }}
+  labels:
+    {{- include "piaware.labels" . | nindent 4 }}
+data:
+  # General Configuration
+  TZ: {{ .Values.general.timezone | quote }}
+  {{- if .Values.general.verboseLogging }}
+  VERBOSE_LOGGING: "true"
+  {{- end }}
+  {{- if .Values.general.bingMapsApiKey }}
+  BINGMAPSAPIKEY: {{ .Values.general.bingMapsApiKey | quote }}
+  {{- end }}
+
+  # Receiver Configuration
+  RECEIVER_TYPE: {{ .Values.receiver.type | quote }}
+  {{- if .Values.receiver.device }}
+  DUMP1090_DEVICE: {{ .Values.receiver.device | quote }}
+  {{- end }}
+  {{- if .Values.receiver.gain }}
+  RTLSDR_GAIN: {{ .Values.receiver.gain | quote }}
+  {{- end }}
+  {{- if .Values.receiver.ppm }}
+  RTLSDR_PPM: {{ .Values.receiver.ppm | quote }}
+  {{- end }}
+
+  # Relay Mode Configuration
+  {{- if eq .Values.receiver.type "relay" }}
+  {{- if .Values.relay.beastHost }}
+  BEASTHOST: {{ .Values.relay.beastHost | quote }}
+  {{- end }}
+  BEASTPORT: {{ .Values.relay.beastPort | quote }}
+  {{- end }}
+
+  # Multilateration Configuration
+  ALLOW_MLAT: {{ ternary "yes" "no" .Values.mlat.enabled | quote }}
+  MLAT_RESULTS: {{ ternary "yes" "no" .Values.mlat.results | quote }}
+  {{- if .Values.mlat.resultsHost }}
+  MLAT_RESULTS_BEASTHOST: {{ .Values.mlat.resultsHost | quote }}
+  {{- end }}
+  {{- if .Values.mlat.resultsPort }}
+  MLAT_RESULTS_BEASTPORT: {{ .Values.mlat.resultsPort | quote }}
+  {{- end }}
+
+  # UAT Configuration (978MHz)
+  {{- if .Values.uat.receiverType }}
+  UAT_RECEIVER_TYPE: {{ .Values.uat.receiverType | quote }}
+  {{- if .Values.uat.device }}
+  DUMP978_DEVICE: {{ .Values.uat.device | quote }}
+  {{- end }}
+  {{- if .Values.uat.relayHost }}
+  UAT_RECEIVER_HOST: {{ .Values.uat.relayHost | quote }}
+  {{- end }}
+  {{- if .Values.uat.relayPort }}
+  UAT_RECEIVER_PORT: {{ .Values.uat.relayPort | quote }}
+  {{- end }}
+  {{- end }}

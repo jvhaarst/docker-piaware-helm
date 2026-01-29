@@ -1,0 +1,135 @@
+# Default values for piaware
+
+# Namespace configuration
+namespace:
+  create: true
+  name: piaware
+
+# Image configuration
+image:
+  repository: ghcr.io/sdr-enthusiasts/docker-piaware
+  tag: latest-build-640
+  pullPolicy: IfNotPresent
+
+# Node selector - schedule on nodes with RTL-SDR hardware
+nodeSelector:
+  rtlsdr: "true"
+
+# Tolerations for scheduling
+tolerations:
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: "Exists"
+    effect: "NoSchedule"
+  - key: "arm"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+# Resource limits and requests
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# Update strategy for Deployment
+strategy:
+  type: Recreate
+
+# Security context - privileged required for USB device access
+securityContext:
+  privileged: true
+
+# FlightAware Configuration
+flightaware:
+  # Your unique feeder ID from FlightAware (required)
+  feederId: ""
+  # Use existing secret for feeder ID
+  existingSecret: ""
+  # Secret key name for feeder ID
+  secretKey: "FEEDER_ID"
+
+# General Configuration
+general:
+  # Timezone (e.g., "America/New_York")
+  timezone: "UTC"
+  # Enable verbose logging
+  verboseLogging: false
+  # Bing Maps API key (optional, for enhanced maps)
+  bingMapsApiKey: ""
+
+# 1090MHz Receiver Configuration
+receiver:
+  # Receiver type: "rtlsdr" or "relay"
+  type: "rtlsdr"
+  # RTL-SDR device serial number (empty = use first available)
+  device: ""
+  # Gain setting (default: max)
+  gain: ""
+  # PPM frequency correction
+  ppm: ""
+
+# Relay Mode Configuration (when receiver.type is "relay")
+relay:
+  # External BEAST provider hostname
+  beastHost: ""
+  # BEAST port
+  beastPort: "30005"
+
+# Multilateration Configuration
+mlat:
+  # Allow MLAT participation
+  enabled: true
+  # Return MLAT results
+  results: true
+  # MLAT results destination host (optional)
+  resultsHost: ""
+  # MLAT results destination port
+  resultsPort: "31004"
+
+# 978MHz UAT Receiver Configuration (US only)
+uat:
+  # UAT receiver type: "" (disabled), "rtlsdr", or "relay"
+  receiverType: ""
+  # RTL-SDR device serial for 978MHz
+  device: ""
+  # UAT relay host
+  relayHost: ""
+  # UAT relay port
+  relayPort: ""
+
+# Service configuration
+service:
+  enabled: true
+  type: ClusterIP
+  # Web interface port
+  webPort: 8080
+  # BEAST output port
+  beastPort: 30005
+  # BaseStation port
+  baseStationPort: 30003
+  # UAT data port
+  uatPort: 30978
+
+# Liveness probe configuration
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+# Readiness probe configuration
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Labels to add to all resources
+commonLabels: {}
+
+# Annotations to add to pods
+podAnnotations: {}

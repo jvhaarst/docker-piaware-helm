@@ -1,0 +1,20 @@
+# Claude Code
+.claude/
+
+# macOS
+.DS_Store
+
+# Helm
+*.tgz
+.helm-release/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak

@@ -1,0 +1,19 @@
+apiVersion: v2
+name: piaware
+description: A Helm chart for deploying PiAware - FlightAware ADS-B feeder
+type: application
+version: 0.1.0
+appVersion: "build-640"
+keywords:
+  - piaware
+  - flightaware
+  - ads-b
+  - rtl-sdr
+  - aviation
+  - flight-tracking
+home: https://flightaware.com/adsb/piaware/
+sources:
+  - https://github.com/sdr-enthusiasts/docker-piaware
+maintainers:
+  - name: Your Name
+    email: your-email@example.com
