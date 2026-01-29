@@ -5,14 +5,18 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["ghcr.io/sdr-enthusiasts/docker-piaware"],
+      "matchPackageNames": [
+        "ghcr.io/sdr-enthusiasts/docker-piaware"
+      ],
       "versioning": "regex:^latest-build-(?<major>\\d+)$"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["piaware/values\\.yaml$"],
+      "managerFilePatterns": [
+        "/piaware/values\\.yaml$/"
+      ],
       "matchStrings": [
         "repository:\\s*(?<depName>ghcr\\.io/sdr-enthusiasts/docker-piaware)\\s*\\n\\s*tag:\\s*(?<currentValue>latest-build-\\d+)"
       ],
@@ -21,7 +25,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ["piaware/Chart\\.yaml$"],
+      "managerFilePatterns": [
+        "/piaware/Chart\\.yaml$/"
+      ],
       "matchStrings": [
         "appVersion:\\s*\"(?<currentValue>build-\\d+)\""
       ],
