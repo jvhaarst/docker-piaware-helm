@@ -19,7 +19,7 @@
       "matchPackageNames": [
         "ghcr.io/sdr-enthusiasts/docker-piaware"
       ],
-      "versioning": "regex:^latest-build-(?<major>\\d+)$"
+      "versioning": "regex:^latest-build-(?<patch>\\d+)$"
     }
   ],
   "customManagers": [
@@ -32,7 +32,7 @@
         "repository:\\s*(?<depName>ghcr\\.io/sdr-enthusiasts/docker-piaware)\\s*\\n\\s*tag:\\s*(?<currentValue>latest-build-\\d+)"
       ],
       "datasourceTemplate": "docker",
-      "versioningTemplate": "regex:^latest-build-(?<major>\\d+)$"
+      "versioningTemplate": "regex:^latest-build-(?<patch>\\d+)$"
     },
     {
       "customType": "regex",
