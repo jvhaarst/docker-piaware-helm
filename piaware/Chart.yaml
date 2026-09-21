@@ -3,7 +3,7 @@ name: piaware
 description: A Helm chart for deploying PiAware - FlightAware ADS-B feeder
 type: application
 version: 0.1.0
-appVersion: "build-640"
+appVersion: "build-668"
 keywords:
   - piaware
   - flightaware
