@@ -22,7 +22,18 @@
       "matchFileNames": [
         "piaware/values.yaml"
       ],
-      "versioning": "regex:^latest-build-(?<patch>\\d+)$"
+      "versioning": "regex:^latest-build-(?<patch>\\d+)$",
+      "bumpVersions": [
+        {
+          "filePatterns": [
+            "piaware/Chart.yaml"
+          ],
+          "matchStrings": [
+            "version:\\s(?<version>[^\\s]+)"
+          ],
+          "bumpType": "patch"
+        }
+      ]
     },
     {
       "matchPackageNames": [
