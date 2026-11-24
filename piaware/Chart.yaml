@@ -2,8 +2,8 @@ apiVersion: v2
 name: piaware
 description: A Helm chart for deploying PiAware - FlightAware ADS-B feeder
 type: application
-version: 0.1.7
-appVersion: "build-680"
+version: 0.1.8
+appVersion: "build-681"
 keywords:
   - piaware
   - flightaware
